@@ -7,9 +7,10 @@ import MonthlyChart from '@/components/dashboard/MonthlyChart';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { formatCurrency } from '@/utils/currency';
 import { format, parseISO } from 'date-fns';
-import { PlusCircle, ArrowRight } from 'lucide-react';
+import { PlusCircle, ArrowRight, Download } from 'lucide-react';
 import Link from 'next/link';
 import { Category } from '@/types/expense';
+import { exportToCSV } from '@/utils/export';
 
 export default function DashboardPage() {
   const { analytics, expenses, openAddModal, isLoaded } = useExpenseContext();
@@ -33,13 +34,23 @@ export default function DashboardPage() {
             {format(new Date(), "EEEE, MMMM d, yyyy")}
           </p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors shadow-sm"
-        >
-          <PlusCircle size={16} />
-          <span className="hidden sm:inline">Add Expense</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => exportToCSV(expenses)}
+            disabled={expenses.length === 0}
+            className="flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <Download size={16} />
+            <span className="hidden sm:inline">Export CSV</span>
+          </button>
+          <button
+            onClick={openAddModal}
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors shadow-sm"
+          >
+            <PlusCircle size={16} />
+            <span className="hidden sm:inline">Add Expense</span>
+          </button>
+        </div>
       </div>
 
       {/* Summary cards */}
