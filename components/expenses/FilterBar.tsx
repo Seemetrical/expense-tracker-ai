@@ -1,7 +1,6 @@
 'use client';
 
 import { ExpenseFilters } from '@/types/expense';
-import { CATEGORIES } from '@/constants/categories';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
@@ -9,9 +8,10 @@ interface Props {
   filters: ExpenseFilters;
   onChange: (filters: ExpenseFilters) => void;
   resultCount: number;
+  categories: string[];
 }
 
-export default function FilterBar({ filters, onChange, resultCount }: Props) {
+export default function FilterBar({ filters, onChange, resultCount, categories }: Props) {
   const [showFilters, setShowFilters] = useState(false);
 
   function set(field: keyof ExpenseFilters, value: string) {
@@ -78,7 +78,7 @@ export default function FilterBar({ filters, onChange, resultCount }: Props) {
                 className="w-full rounded-lg border border-gray-300 bg-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">All categories</option>
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

@@ -37,3 +37,33 @@ npx tsc --noEmit  # Type-check without building
 - Dates are stored as `YYYY-MM-DD` strings (not Date objects) for simple string comparison in filter logic
 - Toast notifications are managed in `providers.tsx` — `deleteExpense` and `addExpense`/`updateExpense` are wrapped there to inject toasts, so the hook's own methods don't trigger toasts directly
 - localStorage key: `expense-tracker-expenses`
+
+## Version control for feature changes
+
+Every feature change must be committed to a dedicated branch before merging. Branch and commit names follow this convention:
+
+```
+feature_<description_of_feature>_<version>
+```
+
+- `description_of_feature`: short snake_case summary of what the feature does (e.g. `dynamic_categories`, `csv_export`, `recurring_expenses`)
+- `version`: integer starting at `1`, incremented for each iteration of the same feature (e.g. `_1`, `_2`)
+
+**Examples:**
+```
+feature_dynamic_categories_1
+feature_csv_export_1
+feature_dark_mode_1
+feature_dynamic_categories_2   # second iteration / revision
+```
+
+**Workflow for every feature:**
+1. Create a branch: `git checkout -b feature_<description>_<version>`
+2. Make all changes for that feature on the branch
+3. Commit with a matching message: `git commit -m "feature_<description>_<version>: <what changed>"`
+4. Open a PR into `main` — do not commit feature work directly to `main`
+
+**Versioning rules:**
+- Start at `_1` for every new feature
+- Increment the version (e.g. `_1` → `_2`) when reopening or significantly revising a previously completed feature
+- Bug fixes within the same feature iteration stay on the same branch/version

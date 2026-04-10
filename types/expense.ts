@@ -1,10 +1,12 @@
-export type Category =
-  | 'Food'
-  | 'Transportation'
-  | 'Entertainment'
-  | 'Shopping'
-  | 'Bills'
-  | 'Other';
+export type Category = string;
+
+export interface CategoryConfig {
+  color: string;
+  bg: string;
+  border: string;
+  icon: string;
+  chartColor: string;
+}
 
 export interface Expense {
   id: string;

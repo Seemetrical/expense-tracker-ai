@@ -1,9 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { CATEGORY_CONFIG } from '@/constants/categories';
+import { useExpenseContext } from '@/app/providers';
 import { formatCurrency } from '@/utils/currency';
-import { Category } from '@/types/expense';
 
 const PieChart = dynamic(
   () => import('recharts').then((m) => m.PieChart),
@@ -22,6 +21,8 @@ interface Props {
 }
 
 export default function CategoryChart({ spendingByCategory }: Props) {
+  const { getCategoryConfig } = useExpenseContext();
+
   const data = Object.entries(spendingByCategory)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value);
@@ -53,13 +54,13 @@ export default function CategoryChart({ spendingByCategory }: Props) {
               {data.map((entry) => (
                 <Cell
                   key={entry.name}
-                  fill={CATEGORY_CONFIG[entry.name as Category]?.chartColor ?? '#6b7280'}
+                  fill={getCategoryConfig(entry.name).chartColor}
                 />
               ))}
             </Pie>
             <Tooltip
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            formatter={(value: any) => [formatCurrency(Number(value)), 'Spent']}
+              formatter={(value: any) => [formatCurrency(Number(value)), 'Spent']}
               contentStyle={{
                 borderRadius: '8px',
                 border: '1px solid #e5e7eb',
@@ -73,11 +74,11 @@ export default function CategoryChart({ spendingByCategory }: Props) {
       {/* Legend */}
       <div className="flex-1 space-y-2">
         {data.map(({ name, value }) => {
-          const config = CATEGORY_CONFIG[name as Category];
+          const config = getCategoryConfig(name);
           const pct = total > 0 ? (value / total) * 100 : 0;
           return (
             <div key={name} className="flex items-center gap-3">
-              <span className="text-sm">{config?.icon}</span>
+              <span className="text-sm">{config.icon}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium text-gray-700">{name}</span>
@@ -86,7 +87,7 @@ export default function CategoryChart({ spendingByCategory }: Props) {
                 <div className="h-1.5 w-full rounded-full bg-gray-100">
                   <div
                     className="h-1.5 rounded-full transition-all"
-                    style={{ width: `${pct}%`, backgroundColor: config?.chartColor ?? '#6b7280' }}
+                    style={{ width: `${pct}%`, backgroundColor: config.chartColor }}
                   />
                 </div>
               </div>

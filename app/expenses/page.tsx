@@ -19,6 +19,7 @@ export default function ExpensesPage() {
     openEditModal,
     deleteExpense,
     isLoaded,
+    allCategories,
   } = useExpenseContext();
 
   const totalFiltered = filteredExpenses.reduce((s, e) => s + e.amount, 0);
@@ -67,6 +68,7 @@ export default function ExpensesPage() {
         filters={filters}
         onChange={setFilters}
         resultCount={filteredExpenses.length}
+        categories={allCategories}
       />
 
       {/* List */}

@@ -1,13 +1,15 @@
-import { Category } from '@/types/expense';
-import { CATEGORY_CONFIG } from '@/constants/categories';
+'use client';
+
+import { useExpenseContext } from '@/app/providers';
 
 interface Props {
-  category: Category;
+  category: string;
   size?: 'sm' | 'md';
 }
 
 export default function CategoryBadge({ category, size = 'md' }: Props) {
-  const config = CATEGORY_CONFIG[category];
+  const { getCategoryConfig } = useExpenseContext();
+  const config = getCategoryConfig(category);
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full border font-medium

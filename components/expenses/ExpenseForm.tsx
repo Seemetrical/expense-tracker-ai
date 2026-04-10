@@ -1,20 +1,22 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
-import { Expense, Category } from '@/types/expense';
-import { CATEGORIES } from '@/constants/categories';
+import { useState, useRef, FormEvent, KeyboardEvent } from 'react';
+import { Expense } from '@/types/expense';
 import { format } from 'date-fns';
+import { Plus, Check, X } from 'lucide-react';
 
 interface Props {
   onSubmit: (data: Omit<Expense, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
   initialData?: Expense;
+  categories: string[];
+  onAddCategory: (name: string) => boolean;
 }
 
 interface FormState {
   date: string;
   amount: string;
-  category: Category;
+  category: string;
   description: string;
 }
 
@@ -24,14 +26,9 @@ interface FormErrors {
   description?: string;
 }
 
-const DEFAULT_FORM: FormState = {
-  date: format(new Date(), 'yyyy-MM-dd'),
-  amount: '',
-  category: 'Food',
-  description: '',
-};
+export default function ExpenseForm({ onSubmit, onCancel, initialData, categories, onAddCategory }: Props) {
+  const defaultCategory = categories[0] ?? 'Other';
 
-export default function ExpenseForm({ onSubmit, onCancel, initialData }: Props) {
   const [form, setForm] = useState<FormState>(
     initialData
       ? {
@@ -40,10 +37,21 @@ export default function ExpenseForm({ onSubmit, onCancel, initialData }: Props) 
           category: initialData.category,
           description: initialData.description,
         }
-      : DEFAULT_FORM
+      : {
+          date: format(new Date(), 'yyyy-MM-dd'),
+          amount: '',
+          category: defaultCategory,
+          description: '',
+        }
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // New category inline creation state
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryError, setNewCategoryError] = useState('');
+  const newCategoryInputRef = useRef<HTMLInputElement>(null);
 
   function validate(): FormErrors {
     const errs: FormErrors = {};
@@ -76,6 +84,49 @@ export default function ExpenseForm({ onSubmit, onCancel, initialData }: Props) 
   function set(field: keyof FormState, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
+  }
+
+  function handleShowNewCategory() {
+    setShowNewCategory(true);
+    setNewCategoryName('');
+    setNewCategoryError('');
+    setTimeout(() => newCategoryInputRef.current?.focus(), 0);
+  }
+
+  function handleCancelNewCategory() {
+    setShowNewCategory(false);
+    setNewCategoryName('');
+    setNewCategoryError('');
+  }
+
+  function handleConfirmNewCategory() {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      setNewCategoryError('Name is required');
+      return;
+    }
+    if (trimmed.length > 30) {
+      setNewCategoryError('Max 30 characters');
+      return;
+    }
+    const added = onAddCategory(trimmed);
+    if (!added) {
+      setNewCategoryError('Category already exists');
+      return;
+    }
+    set('category', trimmed);
+    setShowNewCategory(false);
+    setNewCategoryName('');
+    setNewCategoryError('');
+  }
+
+  function handleNewCategoryKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleConfirmNewCategory();
+    } else if (e.key === 'Escape') {
+      handleCancelNewCategory();
+    }
   }
 
   return (
@@ -117,7 +168,7 @@ export default function ExpenseForm({ onSubmit, onCancel, initialData }: Props) 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">Category</label>
         <div className="grid grid-cols-3 gap-2">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat}
               type="button"
@@ -131,7 +182,60 @@ export default function ExpenseForm({ onSubmit, onCancel, initialData }: Props) 
               {cat}
             </button>
           ))}
+
+          {/* Add new category button / inline form */}
+          {!showNewCategory ? (
+            <button
+              type="button"
+              onClick={handleShowNewCategory}
+              className="flex items-center justify-center gap-1 rounded-lg border border-dashed border-gray-300 py-2 px-1 text-xs font-medium text-gray-400 transition-all hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50"
+            >
+              <Plus size={12} />
+              New
+            </button>
+          ) : null}
         </div>
+
+        {/* Inline new category input — full width below the grid */}
+        {showNewCategory && (
+          <div className="mt-2">
+            <div className="flex gap-1.5">
+              <input
+                ref={newCategoryInputRef}
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => {
+                  setNewCategoryName(e.target.value);
+                  setNewCategoryError('');
+                }}
+                onKeyDown={handleNewCategoryKeyDown}
+                placeholder="Category name"
+                maxLength={30}
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+                  ${newCategoryError ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white'}`}
+              />
+              <button
+                type="button"
+                onClick={handleConfirmNewCategory}
+                className="flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700 transition-colors"
+                title="Add category"
+              >
+                <Check size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelNewCategory}
+                className="flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-gray-500 hover:bg-gray-50 transition-colors"
+                title="Cancel"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            {newCategoryError && (
+              <p className="mt-1 text-xs text-red-600">{newCategoryError}</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Description */}

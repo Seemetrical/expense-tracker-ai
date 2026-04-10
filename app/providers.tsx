@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { useExpenses } from '@/hooks/useExpenses';
-import { Expense } from '@/types/expense';
+import { useCategories } from '@/hooks/useCategories';
+import { Expense, CategoryConfig } from '@/types/expense';
 import Modal from '@/components/ui/Modal';
 import ToastContainer, { ToastMessage } from '@/components/ui/Toast';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
@@ -11,6 +12,10 @@ import Navbar from '@/components/layout/Navbar';
 type ExpenseContext = ReturnType<typeof useExpenses> & {
   openAddModal: () => void;
   openEditModal: (expense: Expense) => void;
+  allCategories: string[];
+  categoryConfig: Record<string, CategoryConfig>;
+  getCategoryConfig: (name: string) => CategoryConfig;
+  addCategory: (name: string) => boolean;
 };
 
 const Ctx = createContext<ExpenseContext | null>(null);
@@ -23,6 +28,7 @@ export function useExpenseContext() {
 
 export default function Providers({ children }: { children: ReactNode }) {
   const expenses = useExpenses();
+  const categories = useCategories();
   const [modalState, setModalState] = useState<{ open: boolean; editing?: Expense }>({ open: false });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -59,6 +65,10 @@ export default function Providers({ children }: { children: ReactNode }) {
     deleteExpense: handleDelete,
     openAddModal,
     openEditModal,
+    allCategories: categories.allCategories,
+    categoryConfig: categories.categoryConfig,
+    getCategoryConfig: categories.getCategoryConfig,
+    addCategory: categories.addCategory,
   };
 
   return (
@@ -77,6 +87,8 @@ export default function Providers({ children }: { children: ReactNode }) {
           onSubmit={handleSubmit}
           onCancel={() => setModalState({ open: false })}
           initialData={modalState.editing}
+          categories={categories.allCategories}
+          onAddCategory={categories.addCategory}
         />
       </Modal>
 

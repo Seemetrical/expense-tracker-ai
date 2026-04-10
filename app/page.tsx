@@ -9,11 +9,10 @@ import { formatCurrency } from '@/utils/currency';
 import { format, parseISO } from 'date-fns';
 import { PlusCircle, ArrowRight, Download } from 'lucide-react';
 import Link from 'next/link';
-import { Category } from '@/types/expense';
 import { exportToCSV } from '@/utils/export';
 
 export default function DashboardPage() {
-  const { analytics, expenses, openAddModal, isLoaded } = useExpenseContext();
+  const { analytics, expenses, openAddModal, isLoaded, getCategoryConfig } = useExpenseContext();
   const recentExpenses = expenses.slice(0, 5);
 
   if (!isLoaded) {
@@ -59,6 +58,7 @@ export default function DashboardPage() {
         totalThisMonth={analytics.totalThisMonth}
         topCategory={analytics.topCategory}
         totalExpenses={analytics.totalExpenses}
+        getCategoryConfig={getCategoryConfig}
       />
 
       {expenses.length === 0 ? (

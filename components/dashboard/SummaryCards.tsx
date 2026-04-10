@@ -1,6 +1,5 @@
 import { formatCurrency } from '@/utils/currency';
-import { Category } from '@/types/expense';
-import { CATEGORY_CONFIG } from '@/constants/categories';
+import { CategoryConfig } from '@/types/expense';
 import { DollarSign, Calendar, Tag, Receipt } from 'lucide-react';
 
 interface Props {
@@ -8,6 +7,7 @@ interface Props {
   totalThisMonth: number;
   topCategory: string | null;
   totalExpenses: number;
+  getCategoryConfig: (name: string) => CategoryConfig;
 }
 
 export default function SummaryCards({
@@ -15,6 +15,7 @@ export default function SummaryCards({
   totalThisMonth,
   topCategory,
   totalExpenses,
+  getCategoryConfig,
 }: Props) {
   const cards = [
     {
@@ -60,7 +61,7 @@ export default function SummaryCards({
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      {cards.map(({ label, value, sub, icon: Icon, color, bg, text, isCategory }) => (
+      {cards.map(({ label, value, sub, icon: Icon, bg, text, isCategory }) => (
         <div
           key={label}
           className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
@@ -70,7 +71,7 @@ export default function SummaryCards({
           </div>
           <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
           <p className="mt-1 text-2xl font-bold text-gray-900 truncate">
-            {isCategory && value !== '—' && CATEGORY_CONFIG[value as Category]?.icon}{' '}
+            {isCategory && value !== '—' && getCategoryConfig(value).icon}{' '}
             {value}
           </p>
           <p className="mt-0.5 text-xs text-gray-400">{sub}</p>
