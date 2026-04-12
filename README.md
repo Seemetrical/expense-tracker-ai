@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expensify — Personal Expense Tracker
+
+A personal finance tracker built with Next.js, Tailwind CSS, and Recharts. Track expenses, visualise spending by category, manage a monthly budget, and identify your top vendors.
+
+## Features
+
+- **Dashboard** — summary cards, 6-month bar chart, category pie chart, recent expenses
+- **Expense table** — filterable and sortable list with CSV export
+- **Monthly Analytics** — current-month pie chart with % labels on slices, monthly budget tracker with progress bar and days-to-reset countdown
+- **Top Categories** — all-time ranked breakdown of spending by category
+- **Top Vendors** — top 20 vendors by total spend, derived from expense descriptions
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev       # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other commands:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build     # Production build
+npm run lint      # ESLint
+npx tsc --noEmit  # Type-check without building
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack
 
-## Learn More
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Styling | Tailwind CSS |
+| Charts | Recharts (loaded client-side via `dynamic()`) |
+| Icons | Lucide React |
+| Date handling | date-fns |
+| Persistence | localStorage |
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx               # Dashboard (/)
+  expenses/page.tsx      # Expense table (/expenses)
+  analytics/page.tsx     # Monthly analytics (/analytics)
+  top-categories/page.tsx  # Top categories (/top-categories)
+  top-vendors/page.tsx   # Top vendors (/top-vendors)
+  providers.tsx          # Global state + context
+  layout.tsx             # Root layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+components/
+  dashboard/             # SummaryCards, CategoryChart, MonthlyChart
+  expenses/              # ExpenseList, ExpenseForm, FilterBar
+  layout/                # Navbar
+  ui/                    # CategoryBadge, Modal, Toast
 
-## Deploy on Vercel
+hooks/
+  useExpenses.ts         # Central data layer (CRUD, filtering, analytics)
+  useCategories.ts       # Category management with custom category support
+  useBudget.ts           # Monthly budget persistence
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+constants/
+  categories.ts          # Category colours, icons, chart hex codes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+types/
+  expense.ts             # Expense, ExpenseFilters, CategoryConfig types
+
+utils/
+  currency.ts            # formatCurrency, formatCompact
+  storage.ts             # localStorage load/save helpers
+  export.ts              # CSV export
+```
+
+## Data Model
+
+```ts
+interface Expense {
+  id: string;
+  date: string;        // YYYY-MM-DD
+  amount: number;
+  category: string;
+  description: string;
+  createdAt: string;   // ISO timestamp
+}
+```
+
+localStorage keys:
+- `expense-tracker-expenses` — expense array
+- `expense-tracker-budget` — monthly budget amount
+- `expense-tracker-categories` — custom user-defined categories
