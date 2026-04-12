@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, List, PlusCircle, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, List, PlusCircle, TrendingUp, Store } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/expenses', label: 'Expenses', icon: List },
+  { href: '/top-vendors', label: 'Top Vendors', icon: Store },
 ];
 
 interface Props {
