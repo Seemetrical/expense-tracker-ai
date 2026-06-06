@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutList, Bookmark, Settings } from 'lucide-react';
+import { LayoutList, Bookmark, Settings, Radio } from 'lucide-react';
 
 const links = [
   { href: '/transactions', label: 'Transactions', icon: LayoutList },
+  { href: '/radar', label: 'En Bloc Radar', icon: Radio },
   { href: '/watchlist', label: 'Watchlist', icon: Bookmark },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
