@@ -10,9 +10,17 @@ A personal finance tracker built with Next.js, Tailwind CSS, and Recharts. Track
 - **Top Categories** — all-time ranked breakdown of spending by category
 - **Top Vendors** — top 20 vendors by total spend, derived from expense descriptions
 
+## Privacy
+
+Expensify has no backend, accounts, analytics or network calls. All data (expenses, budget, custom categories) is stored in your browser's `localStorage` and never leaves your device. Clearing site data removes it.
+
 ## Getting Started
 
+Requires Node.js 20 or later.
+
 ```bash
+git clone https://github.com/Seemetrical/expense-tracker-ai.git
+cd expense-tracker-ai
 npm install
 npm run dev       # http://localhost:3000
 ```
