@@ -88,3 +88,7 @@ localStorage keys:
 - `expense-tracker-expenses` — expense array
 - `expense-tracker-budget` — monthly budget amount
 - `expense-tracker-categories` — custom user-defined categories
+
+## License
+
+No license has been specified yet; all rights are reserved by the author until one is added.
