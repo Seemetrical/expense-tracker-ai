@@ -21,22 +21,29 @@ npx tsc --noEmit  # Type-check without building
 - Filtering + sorting (derived from `expenses` + `filters` + `sortField`/`sortOrder`)
 - Analytics computed values: `totalAllTime`, `totalThisMonth`, `spendingByCategory`, `monthlyData` (last 6 months)
 
+**`hooks/useBudget.ts`** manages the monthly budget. Persists a single numeric value to localStorage (`expense-tracker-budget`). Exposes `budget`, `setBudget`, `clearBudget`, and `isLoaded`.
+
+**`hooks/useCategories.ts`** manages the category list. Extends the default `CATEGORIES` constant with user-defined categories persisted to localStorage (`expense-tracker-categories`). Exposes `allCategories`, `categoryConfig`, `getCategoryConfig`, and `addCategory`.
+
 **Routes:**
-- `/` — Dashboard with summary cards, pie chart, bar chart, recent expenses
+- `/` — Dashboard with summary cards, 6-month bar chart, category pie chart, recent expenses
 - `/expenses` — Full filterable/sortable expense table with CSV export
+- `/analytics` — Monthly analytics: budget tracker (set budget, progress bar, days to reset) + current-month category pie chart with % labels and legend table
+- `/top-categories` — All-time ranked category breakdown with proportional bars
+- `/top-vendors` — Top 20 vendors by spend (grouped from `description` field) with transaction counts
 
-**Charts (`components/dashboard/`)** use Recharts. Both chart components use `dynamic()` with `{ ssr: false }` — required because Recharts is browser-only. Each recharts primitive (`PieChart`, `Bar`, etc.) is imported via a separate `dynamic()` call.
+**Charts (`components/dashboard/`)** use Recharts. All chart components use `dynamic()` with `{ ssr: false }` — required because Recharts is browser-only. Each Recharts primitive (`PieChart`, `Bar`, etc.) is imported via a separate `dynamic()` call. When adding custom label render functions to `Pie`, type the props against `PieLabelRenderProps` from recharts (all fields are optional — use null checks before arithmetic).
 
-**Data types** (`types/expense.ts`): `Expense` has `id`, `date` (YYYY-MM-DD string), `amount` (number), `category` (union type), `description`, `createdAt` (ISO timestamp). `ExpenseFilters` drives both the filter UI and the derived `filteredExpenses` array.
+**Data types** (`types/expense.ts`): `Expense` has `id`, `date` (YYYY-MM-DD string), `amount` (number), `category` (string), `description`, `createdAt` (ISO timestamp). `ExpenseFilters` drives both the filter UI and the derived `filteredExpenses` array.
 
-**Category config** in `constants/categories.ts` is the single source of truth for category colors, icons, and chart hex codes — used by `CategoryBadge`, the pie chart, and the legend.
+**Category config** in `constants/categories.ts` is the single source of truth for category colors, icons, and chart hex codes — used by `CategoryBadge`, the pie chart, and the legend. Custom categories are assigned styles from `CUSTOM_CATEGORY_PALETTE` at creation time.
 
 ## Key conventions
 
 - All interactive components have `'use client'` at the top
 - Dates are stored as `YYYY-MM-DD` strings (not Date objects) for simple string comparison in filter logic
 - Toast notifications are managed in `providers.tsx` — `deleteExpense` and `addExpense`/`updateExpense` are wrapped there to inject toasts, so the hook's own methods don't trigger toasts directly
-- localStorage key: `expense-tracker-expenses`
+- localStorage keys: `expense-tracker-expenses` (expenses), `expense-tracker-budget` (monthly budget), `expense-tracker-categories` (custom categories)
 
 ## Version control for feature changes
 
